@@ -12,6 +12,8 @@ import { SocialMediaStats } from "@/components/dashboard/SocialMediaStats";
 import { GoogleAnalyticsConfig } from "@/components/dashboard/GoogleAnalyticsConfig";
 import { ErrorTracker } from "@/components/dashboard/ErrorTracker";
 import { AIAgent } from "@/components/dashboard/AIAgent";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import { ProtectedDashboard } from "@/components/dashboard/ProtectedDashboard";
 
 // Mock data for the dashboard
 const mockStats = [
@@ -221,7 +223,9 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex min-h-screen bg-neutral-900">
+    <ProtectedRoute>
+      <ProtectedDashboard>
+        <div className="flex min-h-screen bg-neutral-900">
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
       <main className="flex-1">
         <Header
@@ -302,6 +306,8 @@ export default function Dashboard() {
           )}
         </div>
       </main>
-    </div>
+      </div>
+    </ProtectedDashboard>
+    </ProtectedRoute>
   );
 }
