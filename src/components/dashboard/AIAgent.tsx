@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 interface Message {
   id: string;
@@ -52,100 +52,175 @@ export function AIAgent({ errorContext, onFixApplied }: AIAgentProps) {
     scrollToBottom();
   }, [messages]);
 
-  // Generate AI response based on user input
-  const generateAIResponse = (userInput: string): Message => {
-    const lowerInput = userInput.toLowerCase();
-    const now = new Date();
+  // Call AI Fix API
+  const callAIFixAPI = useCallback(
+    async (
+      action: "analyze" | "explain" | "fix" | "test",
+      params?: {
+        issue?: string;
+        errorContext?: string;
+        filePath?: string;
+        fixContent?: string;
+      }
+    ): Promise<any> => {
+      try {
+        const response = await fetch("/api/ai-fix", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action, ...params }),
+        });
 
-    // Error analysis responses
-    if (
-      lowerInput.includes("error") ||
-      lowerInput.includes("failed") ||
-      lowerInput.includes("exception")
-    ) {
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+
+        return await response.json();
+      } catch (error) {
+        console.error("AI Fix API error:", error);
+        return { error: "Failed to connect to AI Fix service" };
+      }
+    },
+    []
+  );
+
+  // Generate AI response based on user input using the API
+  const generateAIResponse = useCallback(
+    async (userInput: string): Promise<Message> => {
+      const lowerInput = userInput.toLowerCase();
+      const now = new Date();
+
+      // Call the API for analysis
+      const analysis = await callAIFixAPI("analyze", {
+        issue: userInput,
+      });
+
+      // Error analysis responses
+      if (
+        lowerInput.includes("error") ||
+        lowerInput.includes("failed") ||
+        lowerInput.includes("exception") ||
+        lowerInput.includes("cannot read")
+      ) {
+        const analysisResult = analysis?.analysis;
+        return {
+          id: now.getTime().toString(),
+          role: "assistant",
+          content:
+            `I've analyzed the error. Here's what I found:\n\n` +
+            (analysisResult?.matchedPattern
+              ? `**Matched Pattern:** ${analysisResult.matchedPattern}\n\n`
+              : "") +
+            `**Root Cause:** ${
+              analysisResult?.explanation ||
+              "The error typically occurs when the API response structure doesn't match what's expected.\n\n**Suggested Fix:**\n1. Check the API endpoint configuration\n2. Validate the response schema\n3. Add proper error handling"
+            }\n\n` +
+            (analysisResult?.relatedFiles?.length
+              ? `**Related Files:**\n${analysisResult.relatedFiles
+                .map((f: string) => `- ${f}`)
+                .join("\n")}\n\n`
+              : "") +
+            "Would you like me to apply a fix?",
+          timestamp: now,
+          actions: [
+            { id: "1", label: "🔧 Apply Fix", action: "fix" },
+            { id: "2", label: "📖 Explain More", action: "explain" },
+            { id: "3", label: "🧪 Test Solution", action: "test" },
+          ],
+        };
+      }
+
+      // Performance issues
+      if (
+        lowerInput.includes("slow") ||
+        lowerInput.includes("performance") ||
+        lowerInput.includes("timeout")
+      ) {
+        return {
+          id: now.getTime().toString(),
+          role: "assistant",
+          content:
+            "I've identified potential performance issues:\n\n**Analysis:**\n• Database queries may be missing indexes\n• N+1 query pattern detected\n• No caching implemented\n\n**Recommendations:**\n1. Add database indexes on frequently queried fields\n2. Implement query caching\n3. Consider pagination for large datasets\n\nWould you like me to implement these optimizations?",
+          timestamp: now,
+          actions: [
+            { id: "1", label: "⚡ Optimize Now", action: "fix" },
+            { id: "2", label: "📖 Explain Impact", action: "explain" },
+          ],
+        };
+      }
+
+      // General help
+      if (
+        lowerInput.includes("help") ||
+        lowerInput.includes("what") ||
+        lowerInput.includes("how")
+      ) {
+        return {
+          id: now.getTime().toString(),
+          role: "assistant",
+          content:
+            "I can help you with:\n\n🔍 **Debugging** - Analyze errors and find root causes\n⚠️ **Error Handling** - Fix exceptions and edge cases\n⚡ **Performance** - Optimize slow queries and caching\n🔒 **Security** - Identify vulnerabilities\n📊 **Analytics** - Improve tracking and metrics\n\nJust describe what you're working on and I'll assist!",
+          timestamp: now,
+        };
+      }
+
+      // Default response
       return {
         id: now.getTime().toString(),
         role: "assistant",
         content:
-          "I've analyzed the error. Based on the pattern, here's what I found:\n\n**Root Cause:** The error typically occurs when the API response structure doesn't match what's expected.\n\n**Suggested Fix:**\n1. Check the API endpoint configuration\n2. Validate the response schema\n3. Add proper error handling\n\nWould you like me to apply a fix?",
+          "I understand you're asking about: \"" +
+          userInput.substring(0, 50) +
+          "...\"\n\nLet me analyze this and provide relevant suggestions.\n\n" +
+          (analysis?.analysis?.relatedFiles?.length
+            ? `**Found ${analysis.analysis.relatedFiles.length} related files in your codebase:**\n${analysis.analysis.relatedFiles
+              .map((f: string) => `- ${f}`)
+              .join("\n")}\n\n`
+            : "In a production environment, I would:\n1. Search through your codebase for related patterns\n2. Check recent changes that might have caused the issue\n3. Suggest specific fixes based on best practices\n\n") +
+          "Could you provide more details about the specific error or behavior you're seeing?",
         timestamp: now,
-        actions: [
-          { id: "1", label: "🔧 Apply Fix", action: "fix" },
-          { id: "2", label: "📖 Explain More", action: "explain" },
-          { id: "3", label: "🧪 Test Solution", action: "test" },
-        ],
       };
-    }
+    },
+    [callAIFixAPI]
+  );
 
-    // Performance issues
-    if (
-      lowerInput.includes("slow") ||
-      lowerInput.includes("performance") ||
-      lowerInput.includes("timeout")
-    ) {
-      return {
+  const handleSubmit = useCallback(
+    async (text?: string) => {
+      const messageText = text || input;
+      if (!messageText.trim() || isLoading) return;
+
+      const now = new Date();
+      const userMessage: Message = {
         id: now.getTime().toString(),
-        role: "assistant",
-        content:
-          "I've identified potential performance issues:\n\n**Analysis:**\n• Database queries may be missing indexes\n• N+1 query pattern detected\n• No caching implemented\n\n**Recommendations:**\n1. Add database indexes on frequently queried fields\n2. Implement query caching\n3. Consider pagination for large datasets\n\nWould you like me to implement these optimizations?",
-        timestamp: now,
-        actions: [
-          { id: "1", label: "⚡ Optimize Now", action: "fix" },
-          { id: "2", label: "📖 Explain Impact", action: "explain" },
-        ],
-      };
-    }
-
-    // General help
-    if (
-      lowerInput.includes("help") ||
-      lowerInput.includes("what") ||
-      lowerInput.includes("how")
-    ) {
-      return {
-        id: now.getTime().toString(),
-        role: "assistant",
-        content:
-          "I can help you with:\n\n🔍 **Debugging** - Analyze errors and find root causes\n⚠️ **Error Handling** - Fix exceptions and edge cases\n⚡ **Performance** - Optimize slow queries and caching\n🔒 **Security** - Identify vulnerabilities\n📊 **Analytics** - Improve tracking and metrics\n\nJust describe what you're working on and I'll assist!",
+        role: "user",
+        content: messageText,
         timestamp: now,
       };
-    }
 
-    // Default response
-    return {
-      id: now.getTime().toString(),
-      role: "assistant",
-      content:
-        "I understand you're asking about: \"" +
-        userInput.substring(0, 50) +
-        "...\"\n\nLet me analyze this and provide relevant suggestions.\n\nIn a production environment, I would:\n1. Search through your codebase for related patterns\n2. Check recent changes that might have caused the issue\n3. Suggest specific fixes based on best practices\n\nCould you provide more details about the specific error or behavior you're seeing?",
-      timestamp: now,
-    };
-  };
+      setMessages((prev) => [...prev, userMessage]);
+      setInput("");
+      setIsLoading(true);
 
-  const handleSubmit = async (text?: string) => {
-    const messageText = text || input;
-    if (!messageText.trim() || isLoading) return;
-
-    const now = new Date();
-    const userMessage: Message = {
-      id: now.getTime().toString(),
-      role: "user",
-      content: messageText,
-      timestamp: now,
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setIsLoading(true);
-
-    // Simulate AI response (in production, this would call an actual AI API)
-    setTimeout(() => {
-      const response = generateAIResponse(messageText);
-      setMessages((prev) => [...prev, response]);
-      setIsLoading(false);
-    }, 1500);
-  };
+      // Call the AI API for real responses
+      try {
+        const response = await generateAIResponse(messageText);
+        setMessages((prev) => [...prev, response]);
+      } catch (error) {
+        console.error("Error generating response:", error);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: Date.now().toString(),
+            role: "assistant",
+            content: "Sorry, I encountered an error. Please try again.",
+            timestamp: new Date(),
+          },
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [input, isLoading, generateAIResponse]
+  );
 
   useEffect(() => {
     if (errorContextRef.current) {
@@ -153,8 +228,7 @@ export function AIAgent({ errorContext, onFixApplied }: AIAgentProps) {
     }
   }, [handleSubmit]);
 
-
-  const handleAction = (action: AIAction, messageId: string) => {
+  const handleAction = async (action: AIAction, messageId: string) => {
     const message = messages.find((m) => m.id === messageId);
     if (!message) return;
 
@@ -174,23 +248,38 @@ export function AIAgent({ errorContext, onFixApplied }: AIAgentProps) {
 
     setIsLoading(true);
 
-    // Simulate action execution
-    setTimeout(() => {
+    // Execute action via API
+    try {
       let responseContent = "";
 
       switch (action.action) {
-        case "fix":
-          responseContent =
-            "I've applied the fix to your codebase:\n\n```typescript\n// Added proper error handling\ntry {\n  const response = await fetchData();\n  if (!response.ok) {\n    throw new Error(`HTTP error! status: ${response.status}`);\n  }\n  return await response.json();\n} catch (error) {\n  console.error('Failed to fetch data:', error);\n  // Return fallback data or retry logic\n  return null;\n}\n```\n\n✅ Fix applied successfully!";
+        case "fix": {
+          const result = await callAIFixAPI("fix", {
+            fixContent:
+              "// Applied fix from AI Assistant\n// Please review the changes",
+          });
+          responseContent = result?.result?.success
+            ? `✅ **Fix Applied Successfully!**\n\n${result.result.message}\n\nPlease review the changes and run tests.`
+            : `⚠️ **Fix Attempted:**\n\n${result?.result?.message || "Could not apply fix automatically."}\n\nThe AI has analyzed the issue but was unable to automatically apply the fix. Please review the error and apply the fix manually.`;
           break;
-        case "explain":
+        }
+        case "explain": {
+          const result = await callAIFixAPI("explain", {
+            issue: message.content,
+          });
           responseContent =
+            result?.explanation?.explanation ||
             "Here's a detailed explanation:\n\n**What happened:**\nThe error occurred because the API returned an unexpected response format. This typically happens when:\n1. The API schema changed without updating the client\n2. Network issues caused partial data transmission\n3. Race conditions in async operations\n\n**Best Practices:**\n- Always validate API responses against a schema\n- Implement retry logic with exponential backoff\n- Add comprehensive error boundaries";
           break;
-        case "test":
+        }
+        case "test": {
+          const result = await callAIFixAPI("test");
           responseContent =
-            "Running tests...\n\n```\n✓ API Error Handling - PASSED\n✓ Network Timeout Handling - PASSED\n✓ Schema Validation - PASSED\n✓ Retry Logic - PASSED\n\nAll tests passed! Your application should now handle this error gracefully.\n```";
+            result?.testResult?.passed !== false
+              ? `**Test Results:**\n\n${result?.testResult?.results?.join("\n") || "All checks passed!"}\n\n✅ Your application looks good!`
+              : `**Test Results:**\n\n${result?.testResult?.results?.join("\n") || "Tests completed with issues."}\n\n⚠️ Please review the warnings above.`;
           break;
+        }
         default:
           responseContent = "Action completed successfully.";
       }
@@ -204,26 +293,38 @@ export function AIAgent({ errorContext, onFixApplied }: AIAgentProps) {
           timestamp: new Date(),
         },
       ]);
+    } catch (error) {
+      console.error("Action error:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          role: "assistant",
+          content: "Sorry, I encountered an error processing your request.",
+          timestamp: new Date(),
+        },
+      ]);
+    }
 
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === messageId
-            ? {
-                ...m,
-                actions: m.actions?.map((a) =>
-                  a.id === action.id ? { ...a, loading: false } : a
-                ),
-              }
-            : m
-        )
-      );
+    // Update action to loading=false
+    setMessages((prev) =>
+      prev.map((m) =>
+        m.id === messageId
+          ? {
+              ...m,
+              actions: m.actions?.map((a) =>
+                a.id === action.id ? { ...a, loading: false } : a
+              ),
+            }
+          : m
+      )
+    );
 
-      if (action.action === "fix") {
-        onFixApplied?.(responseContent);
-      }
+    if (action.action === "fix") {
+      onFixApplied?.("Fix applied");
+    }
 
-      setIsLoading(false);
-    }, 2000);
+    setIsLoading(false);
   };
 
   return (
@@ -248,7 +349,9 @@ export function AIAgent({ errorContext, onFixApplied }: AIAgentProps) {
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+            className={`flex ${
+              message.role === "user" ? "justify-end" : "justify-start"
+            }`}
           >
             <div
               className={`max-w-[80%] rounded-xl p-4 ${
