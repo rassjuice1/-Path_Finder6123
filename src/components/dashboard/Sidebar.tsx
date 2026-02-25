@@ -10,10 +10,13 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { id: "overview", label: "Overview", icon: "📊" },
+  { id: "social", label: "Social Media", icon: "🌐" },
   { id: "endpoints", label: "Endpoints", icon: "🔗" },
   { id: "requests", label: "Requests", icon: "📨" },
   { id: "responses", label: "Responses", icon: "📋" },
   { id: "analytics", label: "Analytics", icon: "📈" },
+  { id: "errors", label: "Errors", icon: "🚨" },
+  { id: "ai-agent", label: "AI Fix Agent", icon: "🤖" },
   { id: "settings", label: "Settings", icon: "⚙️" },
 ];
 

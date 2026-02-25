@@ -8,6 +8,10 @@ import { APIResponseViewer } from "@/components/dashboard/APIResponseViewer";
 import { EndpointsTable } from "@/components/dashboard/EndpointsTable";
 import { RequestChart, StatusCodeChart, ResponseTimeChart } from "@/components/dashboard/Charts";
 import { APISettings } from "@/components/dashboard/APISettings";
+import { SocialMediaStats } from "@/components/dashboard/SocialMediaStats";
+import { GoogleAnalyticsConfig } from "@/components/dashboard/GoogleAnalyticsConfig";
+import { ErrorTracker } from "@/components/dashboard/ErrorTracker";
+import { AIAgent } from "@/components/dashboard/AIAgent";
 
 // Mock data for the dashboard
 const mockStats = [
@@ -155,6 +159,10 @@ const tabInfo: Record<string, { title: string; subtitle: string }> = {
     title: "Dashboard Overview",
     subtitle: "Monitor your API performance and usage",
   },
+  social: {
+    title: "Social Media Analytics",
+    subtitle: "Track traffic from social media platforms",
+  },
   endpoints: {
     title: "API Endpoints",
     subtitle: "Manage and monitor your API endpoints",
@@ -171,6 +179,14 @@ const tabInfo: Record<string, { title: string; subtitle: string }> = {
     title: "Analytics",
     subtitle: "Detailed performance analytics",
   },
+  errors: {
+    title: "Error Tracker",
+    subtitle: "Monitor and resolve application errors",
+  },
+  "ai-agent": {
+    title: "AI Fix Agent",
+    subtitle: "Get AI-powered assistance to fix issues",
+  },
   settings: {
     title: "Settings",
     subtitle: "Configure your API connection",
@@ -181,11 +197,27 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [apiBaseUrl, setApiBaseUrl] = useState("https://api.example.com/v1");
   const [apiKey, setApiKey] = useState("sk_live_xxxxxxxxxxxxxxxxxxxxx");
+  const [gaConfig, setGaConfig] = useState({ propertyId: "", credentials: "" });
+  const [errorContext, setErrorContext] = useState<string | undefined>();
+  const [errorCount, setErrorCount] = useState(0);
 
   const handleApiUpdate = (baseUrl: string, key: string) => {
     setApiBaseUrl(baseUrl);
     setApiKey(key);
     console.log("API Updated:", { baseUrl, key });
+  };
+
+  const handleGAUpdate = (config: { propertyId: string; credentials: string }) => {
+    setGaConfig(config);
+    console.log("GA Config Updated:", config);
+  };
+
+  const handleErrorCountChange = (count: number) => {
+    setErrorCount(count);
+  };
+
+  const handleAIFixApplied = (fix: string) => {
+    console.log("AI Fix applied:", fix);
   };
 
   return (
@@ -205,6 +237,13 @@ export default function Dashboard() {
                 <StatusCodeChart />
               </div>
               <APIResponseViewer responses={mockResponses} />
+            </div>
+          )}
+
+          {activeTab === "social" && (
+            <div className="space-y-8">
+              <GoogleAnalyticsConfig config={gaConfig} onUpdate={handleGAUpdate} />
+              {gaConfig.propertyId && <SocialMediaStats config={gaConfig} />}
             </div>
           )}
 
@@ -239,13 +278,26 @@ export default function Dashboard() {
             </div>
           )}
 
+          {activeTab === "errors" && (
+            <div className="space-y-8">
+              <ErrorTracker onErrorCountChange={handleErrorCountChange} />
+            </div>
+          )}
+
+          {activeTab === "ai-agent" && (
+            <div className="space-y-8">
+              <AIAgent errorContext={errorContext} onFixApplied={handleAIFixApplied} />
+            </div>
+          )}
+
           {activeTab === "settings" && (
-            <div className="max-w-2xl">
+            <div className="max-w-2xl space-y-8">
               <APISettings
                 baseUrl={apiBaseUrl}
                 apiKey={apiKey}
                 onUpdate={handleApiUpdate}
               />
+              <GoogleAnalyticsConfig config={gaConfig} onUpdate={handleGAUpdate} />
             </div>
           )}
         </div>
