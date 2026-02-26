@@ -12,6 +12,7 @@ import { SocialMediaStats } from "@/components/dashboard/SocialMediaStats";
 import { GoogleAnalyticsConfig } from "@/components/dashboard/GoogleAnalyticsConfig";
 import { ErrorTracker } from "@/components/dashboard/ErrorTracker";
 import { ProtectedDashboard } from "@/components/dashboard/ProtectedDashboard";
+import { RevenueAnalytics } from "@/components/dashboard/RevenueAnalytics";
 import { useAuth } from "@/lib/AuthContext";
 
 // Mock data for the dashboard
@@ -164,6 +165,10 @@ const tabInfo: Record<string, { title: string; subtitle: string }> = {
     title: "Social Media Analytics",
     subtitle: "Track traffic from social media platforms",
   },
+  revenue: {
+    title: "Revenue Analytics",
+    subtitle: "Track income from subscriptions, data packages, and API usage",
+  },
   endpoints: {
     title: "API Endpoints",
     subtitle: "Manage and monitor your API endpoints",
@@ -237,6 +242,12 @@ export default function Dashboard() {
             <div className="space-y-8">
               <GoogleAnalyticsConfig config={gaConfig} onUpdate={handleGAUpdate} />
               {gaConfig.propertyId && <SocialMediaStats config={gaConfig} />}
+            </div>
+          )}
+
+          {activeTab === "revenue" && (
+            <div className="space-y-8">
+              <RevenueAnalytics />
             </div>
           )}
 

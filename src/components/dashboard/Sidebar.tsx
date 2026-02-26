@@ -11,6 +11,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { id: "overview", label: "Overview", icon: "📊" },
   { id: "social", label: "Social Media", icon: "🌐" },
+  { id: "revenue", label: "Revenue", icon: "💰" },
   { id: "endpoints", label: "Endpoints", icon: "🔗" },
   { id: "requests", label: "Requests", icon: "📨" },
   { id: "responses", label: "Responses", icon: "📋" },
