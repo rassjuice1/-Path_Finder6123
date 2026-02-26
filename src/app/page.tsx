@@ -11,7 +11,6 @@ import { APISettings } from "@/components/dashboard/APISettings";
 import { SocialMediaStats } from "@/components/dashboard/SocialMediaStats";
 import { GoogleAnalyticsConfig } from "@/components/dashboard/GoogleAnalyticsConfig";
 import { ErrorTracker } from "@/components/dashboard/ErrorTracker";
-import { AIAgent } from "@/components/dashboard/AIAgent";
 import { ProtectedDashboard } from "@/components/dashboard/ProtectedDashboard";
 import { useAuth } from "@/lib/AuthContext";
 
@@ -185,10 +184,6 @@ const tabInfo: Record<string, { title: string; subtitle: string }> = {
     title: "Error Tracker",
     subtitle: "Monitor and resolve application errors",
   },
-  "ai-agent": {
-    title: "AI Fix Agent",
-    subtitle: "Get AI-powered assistance to fix issues",
-  },
   settings: {
     title: "Settings",
     subtitle: "Configure your API connection",
@@ -200,7 +195,6 @@ export default function Dashboard() {
   const [apiBaseUrl, setApiBaseUrl] = useState("https://api.example.com/v1");
   const [apiKey, setApiKey] = useState("sk_live_xxxxxxxxxxxxxxxxxxxxx");
   const [gaConfig, setGaConfig] = useState({ propertyId: "", credentials: "" });
-  const [errorContext, setErrorContext] = useState<string | undefined>();
   const [errorCount, setErrorCount] = useState(0);
 
   const handleApiUpdate = (baseUrl: string, key: string) => {
@@ -216,10 +210,6 @@ export default function Dashboard() {
 
   const handleErrorCountChange = (count: number) => {
     setErrorCount(count);
-  };
-
-  const handleAIFixApplied = (fix: string) => {
-    console.log("AI Fix applied:", fix);
   };
 
   return (
@@ -284,12 +274,6 @@ export default function Dashboard() {
           {activeTab === "errors" && (
             <div className="space-y-8">
               <ErrorTracker onErrorCountChange={handleErrorCountChange} />
-            </div>
-          )}
-
-          {activeTab === "ai-agent" && (
-            <div className="space-y-8">
-              <AIAgent errorContext={errorContext} onFixApplied={handleAIFixApplied} />
             </div>
           )}
 
