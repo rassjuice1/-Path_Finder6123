@@ -1,5 +1,6 @@
 // Credit and Token System for API Dashboard
 // Company: Conten-Distribution@Path_Finder#.Ltd receives 1% revenue
+// Dashboard: AI API Revenue Tracker for Creators
 
 export interface CreditPackage {
   id: string;
@@ -26,9 +27,12 @@ export interface CreditPurchase {
   companyCut: number; // 1% to Conten-Distribution@Path_Finder#.Ltd
   timestamp: Date;
   status: 'pending' | 'completed' | 'failed';
+  paymentMethod: PaymentMethod;
 }
 
 export type UserTier = 'demo' | 'basic' | 'pro' | 'enterprise';
+
+export type PaymentMethod = 'paypal' | 'phantom' | 'coinbase' | 'card' | 'bank';
 
 export interface PricingTier {
   id: UserTier;
@@ -39,6 +43,40 @@ export interface PricingTier {
   features: string[];
   popular?: boolean;
 }
+
+// Payment method display info
+export const PAYMENT_METHODS = [
+  {
+    id: 'paypal' as PaymentMethod,
+    name: 'PayPal',
+    icon: '💳',
+    description: 'Pay with your PayPal account'
+  },
+  {
+    id: 'card' as PaymentMethod,
+    name: 'Credit/Debit Card',
+    icon: '💳',
+    description: 'Visa, Mastercard, Amex'
+  },
+  {
+    id: 'bank' as PaymentMethod,
+    name: 'Bank Transfer',
+    icon: '🏦',
+    description: 'Direct bank transfer'
+  },
+  {
+    id: 'phantom' as PaymentMethod,
+    name: 'Phantom Wallet',
+    icon: '👻',
+    description: 'Solana wallet (Crypto)'
+  },
+  {
+    id: 'coinbase' as PaymentMethod,
+    name: 'Coinbase Wallet',
+    icon: '₿',
+    description: 'Bitcoin & Ethereum wallet'
+  }
+];
 
 // Company info for revenue allocation
 export const COMPANY_INFO = {
@@ -171,7 +209,8 @@ export function generatePurchaseId(): string {
 // Mock function to simulate credit purchase (would integrate with Stripe in production)
 export async function purchaseCredits(
   userId: string,
-  packageId: string
+  packageId: string,
+  paymentMethod: PaymentMethod = 'card'
 ): Promise<CreditPurchase> {
   const creditPackage = CREDIT_PACKAGES.find(p => p.id === packageId);
   if (!creditPackage) {
@@ -190,7 +229,8 @@ export async function purchaseCredits(
     amount: creditPackage.price,
     companyCut,
     timestamp: new Date(),
-    status: 'completed'
+    status: 'completed',
+    paymentMethod
   };
 }
 

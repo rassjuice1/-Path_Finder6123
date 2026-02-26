@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/lib/AuthContext';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Twitter, Linkedin, Github, ArrowRight, Sparkles, BarChart3, Shield, Zap } from 'lucide-react';
 
 // Social login providers
@@ -45,7 +45,8 @@ const socialProviders = [
 ];
 
 export default function GoogleSignIn() {
-  const { user, loading, signInWithGoogle, isDemo } = useAuth();
+  const { user, loading: authLoading, signInWithGoogle, isDemo } = useAuth();
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -55,21 +56,39 @@ export default function GoogleSignIn() {
   }, [user, loading, router]);
 
   const handleSignIn = async (providerId: string) => {
-    // For now, all providers use Google sign-in as placeholder
-    // In production, implement provider-specific OAuth
-    if (providerId === 'google') {
-      await signInWithGoogle();
-    } else {
-      // Demo: simulate social login
-      await signInWithGoogle();
-    }
+    // Demo mode: simulate different provider sign-ins
+    // In production, implement real OAuth for each provider
+    const providerNames: Record<string, string> = {
+      google: 'Google',
+      twitter: 'Twitter/X',
+      linkedin: 'LinkedIn',
+      github: 'GitHub'
+    };
+    
+    // Simulate sign-in delay
+    setLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Create mock user based on provider (use simple ID for demo)
+    const mockUser = {
+      uid: `demo_${providerId}_user`,
+      email: `demo@${providerId}.com`,
+      displayName: `${providerNames[providerId]} User`,
+      photoURL: '',
+      provider: providerId
+    };
+    
+    // Store in localStorage
+    localStorage.setItem('dashboard_user', JSON.stringify(mockUser));
+    setLoading(false);
+    router.push('/');
   };
 
   const handleDemoMode = () => {
     router.push('/');
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>

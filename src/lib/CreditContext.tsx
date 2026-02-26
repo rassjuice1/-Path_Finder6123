@@ -6,14 +6,15 @@ import {
   CreditPurchase, 
   UserTier, 
   CREDIT_PACKAGES,
-  calculateCompanyRevenue 
+  calculateCompanyRevenue,
+  PaymentMethod 
 } from './credits';
 
 interface CreditContextType {
   credits: UserCredits | null;
   tier: UserTier;
   loading: boolean;
-  purchasePackage: (packageId: string) => Promise<void>;
+  purchasePackage: (packageId: string, paymentMethod?: PaymentMethod) => Promise<void>;
   useCredits: (amount: number) => boolean;
   upgradeTier: (newTier: UserTier) => Promise<void>;
   companyName: string;
@@ -83,7 +84,7 @@ export function CreditProvider({ children, userId }: { children: ReactNode; user
     }
   }, [tier, loading]);
 
-  const purchasePackage = async (packageId: string) => {
+  const purchasePackage = async (packageId: string, paymentMethod: PaymentMethod = 'card') => {
     const creditPackage = CREDIT_PACKAGES.find(p => p.id === packageId);
     if (!creditPackage) {
       throw new Error('Invalid package');
@@ -98,7 +99,8 @@ export function CreditProvider({ children, userId }: { children: ReactNode; user
       amount: creditPackage.price,
       companyCut,
       timestamp: new Date(),
-      status: 'completed'
+      status: 'completed',
+      paymentMethod
     };
 
     setCredits(prev => ({
