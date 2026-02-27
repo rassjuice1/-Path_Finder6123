@@ -22,6 +22,7 @@ The API Dashboard is now a comprehensive platform for creators to track AI API u
 - [x] **Social Login** - Google, Twitter/X, LinkedIn, GitHub sign-in options
 - [x] **Pricing Page** - Subscription plans and credit packages
 - [x] **Payment Methods** - PayPal, Credit Card, Bank Transfer, Phantom Wallet, Coinbase Wallet
+- [x] **GA4 Support** - Environment variable for Google Analytics Property ID
 
 ## Current Structure
 
@@ -108,3 +109,4 @@ export async function GET() {
 | 2026-02-25 | Created comprehensive API Dashboard with sidebar, stats, charts, endpoints table, response viewer, and settings |
 | 2026-02-25 | Added AI Fix Assistant with real code analysis via /api/ai-fix endpoint |
 | 2026-02-26 | Added Revenue Analytics tab for monetizing dashboard data |
+| 2026-02-27 | Added GA4 Property ID env var support and .env.example template |
