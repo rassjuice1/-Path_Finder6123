@@ -199,7 +199,10 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [apiBaseUrl, setApiBaseUrl] = useState("https://api.example.com/v1");
   const [apiKey, setApiKey] = useState("sk_live_xxxxxxxxxxxxxxxxxxxxx");
-  const [gaConfig, setGaConfig] = useState({ propertyId: "", credentials: "" });
+  const [gaConfig, setGaConfig] = useState({ 
+    propertyId: process.env.NEXT_PUBLIC_GA4_PROPERTY_ID || "", 
+    credentials: "" 
+  });
   const [errorCount, setErrorCount] = useState(0);
 
   const handleApiUpdate = (baseUrl: string, key: string) => {
