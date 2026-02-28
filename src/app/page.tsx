@@ -13,6 +13,7 @@ import { GoogleAnalyticsConfig } from "@/components/dashboard/GoogleAnalyticsCon
 import { ErrorTracker } from "@/components/dashboard/ErrorTracker";
 import { ProtectedDashboard } from "@/components/dashboard/ProtectedDashboard";
 import { RevenueAnalytics } from "@/components/dashboard/RevenueAnalytics";
+import { AIAgent } from "@/components/dashboard/AIAgent";
 import { useAuth } from "@/lib/AuthContext";
 
 // Mock data for the dashboard
@@ -161,6 +162,10 @@ const tabInfo: Record<string, { title: string; subtitle: string }> = {
     title: "Dashboard Overview",
     subtitle: "Monitor your API performance and usage",
   },
+  "ai-agent": {
+    title: "AI Agent",
+    subtitle: "AI-powered analysis and automated fixes",
+  },
   social: {
     title: "Social Media Analytics",
     subtitle: "Track traffic from social media platforms",
@@ -238,6 +243,12 @@ export default function Dashboard() {
                 <StatusCodeChart />
               </div>
               <APIResponseViewer responses={mockResponses} />
+            </div>
+          )}
+
+          {activeTab === "ai-agent" && (
+            <div className="space-y-8">
+              <AIAgent />
             </div>
           )}
 
