@@ -7,6 +7,7 @@ interface AuthContextType {
   user: MockUser | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
+  signInWithProvider: (provider: string, email: string, displayName: string) => void;
   signOut: () => Promise<void>;
   isDemo: boolean;
 }
@@ -63,6 +64,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const signInWithProvider = (provider: string, email: string, displayName: string) => {
+    const userData: MockUser = {
+      uid: `demo_${provider}_user`,
+      email,
+      displayName,
+      photoURL: '',
+      provider
+    };
+    setUser(userData);
+    setIsDemo(true);
+    localStorage.setItem('dashboard_user', JSON.stringify(userData));
+  };
+
   const signOut = async () => {
     setLoading(true);
     try {
@@ -81,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signOut, isDemo }}>
+    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInWithProvider, signOut, isDemo }}>
       {children}
     </AuthContext.Provider>
   );

@@ -45,7 +45,7 @@ const socialProviders = [
 ];
 
 export default function GoogleSignIn() {
-  const { user, loading: authLoading, signInWithGoogle, isDemo } = useAuth();
+  const { user, loading: authLoading, signInWithGoogle, signInWithProvider, isDemo } = useAuth();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -65,22 +65,13 @@ export default function GoogleSignIn() {
       github: 'GitHub'
     };
     
-    // Simulate sign-in delay
-    setLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 800));
+    // Use the AuthContext function to properly set user
+    signInWithProvider(
+      providerId,
+      `demo@${providerId}.com`,
+      `${providerNames[providerId]} User`
+    );
     
-    // Create mock user based on provider (use simple ID for demo)
-    const mockUser = {
-      uid: `demo_${providerId}_user`,
-      email: `demo@${providerId}.com`,
-      displayName: `${providerNames[providerId]} User`,
-      photoURL: '',
-      provider: providerId
-    };
-    
-    // Store in localStorage
-    localStorage.setItem('dashboard_user', JSON.stringify(mockUser));
-    setLoading(false);
     router.push('/');
   };
 

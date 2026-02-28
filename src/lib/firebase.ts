@@ -45,6 +45,7 @@ export interface MockUser {
   email: string;
   displayName: string;
   photoURL: string;
+  provider?: string;
 }
 
 export const mockUser: MockUser = {
