@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { GAConfig, validateGAConfig } from "@/lib/google-analytics";
+import { GAConfig, validateGAConfig, testGAConnection } from "@/lib/google-analytics";
 
 interface GoogleAnalyticsConfigProps {
   config: GAConfig;
@@ -18,6 +18,7 @@ export function GoogleAnalyticsConfig({
   const [showCredentials, setShowCredentials] = useState(false);
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<"success" | "error" | null>(null);
+  const [testError, setTestError] = useState<string | null>(null);
 
   const handleSave = () => {
     const newConfig: GAConfig = {
@@ -39,18 +40,26 @@ export function GoogleAnalyticsConfig({
   const handleTest = async () => {
     setTesting(true);
     setTestResult(null);
+    setTestError(null);
 
-    // Simulate API test
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    // For demo, always succeed if fields are filled
-    if (propertyId.trim() && credentials.trim()) {
-      setTestResult("success");
-    } else {
+    if (!propertyId.trim() || !credentials.trim()) {
       setTestResult("error");
+      setTesting(false);
+      return;
     }
 
-    setTesting(false);
+    // Test the actual connection to Google Analytics
+    const result = await testGAConnection({
+      propertyId: propertyId.trim(),
+      credentials: credentials.trim(),
+    });
+
+    setTestResult(result.success ? "success" : "error");
+    if (!result.success) {
+      setTestError(result.error || "Connection failed");
+    } else {
+      setTestError(null);
+    }
   };
 
   return (
@@ -151,6 +160,9 @@ export function GoogleAnalyticsConfig({
                   ? "Connection successful! Data will start syncing."
                   : "Connection failed. Please check your credentials."}
               </p>
+              {testError && (
+                <p className="text-red-300 text-sm mt-1">{testError}</p>
+              )}
             </div>
           </div>
         </div>
