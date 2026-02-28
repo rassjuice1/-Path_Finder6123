@@ -7,6 +7,9 @@ interface AuthContextType {
   user: MockUser | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
+  signInWithTwitter: () => Promise<void>;
+  signInWithGitHub: () => Promise<void>;
+  signInWithLinkedIn: () => Promise<void>;
   signInWithProvider: (provider: string, email: string, displayName: string) => void;
   signOut: () => Promise<void>;
   isDemo: boolean;
@@ -35,7 +38,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signInWithGoogle = async () => {
     setLoading(true);
     try {
-      // Try to use Firebase Google Sign-In
       const { auth, googleProvider } = await import('./firebase');
       if (auth && googleProvider) {
         const { signInWithPopup } = await import('firebase/auth');
@@ -46,7 +48,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           uid: user.uid,
           email: user.email || '',
           displayName: user.displayName || 'User',
-          photoURL: user.photoURL || ''
+          photoURL: user.photoURL || '',
+          provider: 'google'
         };
         
         setUser(userData);
@@ -55,7 +58,99 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (error: any) {
       console.log('Firebase auth not configured, using demo mode', error.message);
-      // Fall back to demo mode
+      setUser(mockUser);
+      setIsDemo(true);
+      localStorage.setItem('dashboard_user', JSON.stringify(mockUser));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signInWithTwitter = async () => {
+    setLoading(true);
+    try {
+      const { auth, twitterProvider } = await import('./firebase');
+      if (auth && twitterProvider) {
+        const { signInWithPopup } = await import('firebase/auth');
+        const result = await signInWithPopup(auth, twitterProvider);
+        const user = result.user;
+        
+        const userData: MockUser = {
+          uid: user.uid,
+          email: user.email || '',
+          displayName: user.displayName || 'Twitter User',
+          photoURL: user.photoURL || '',
+          provider: 'twitter'
+        };
+        
+        setUser(userData);
+        setIsDemo(false);
+        localStorage.setItem('dashboard_user', JSON.stringify(userData));
+      }
+    } catch (error: any) {
+      console.log('Twitter auth not configured, using demo mode', error.message);
+      setUser(mockUser);
+      setIsDemo(true);
+      localStorage.setItem('dashboard_user', JSON.stringify(mockUser));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signInWithGitHub = async () => {
+    setLoading(true);
+    try {
+      const { auth, githubProvider } = await import('./firebase');
+      if (auth && githubProvider) {
+        const { signInWithPopup } = await import('firebase/auth');
+        const result = await signInWithPopup(auth, githubProvider);
+        const user = result.user;
+        
+        const userData: MockUser = {
+          uid: user.uid,
+          email: user.email || '',
+          displayName: user.displayName || 'GitHub User',
+          photoURL: user.photoURL || '',
+          provider: 'github'
+        };
+        
+        setUser(userData);
+        setIsDemo(false);
+        localStorage.setItem('dashboard_user', JSON.stringify(userData));
+      }
+    } catch (error: any) {
+      console.log('GitHub auth not configured, using demo mode', error.message);
+      setUser(mockUser);
+      setIsDemo(true);
+      localStorage.setItem('dashboard_user', JSON.stringify(mockUser));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signInWithLinkedIn = async () => {
+    setLoading(true);
+    try {
+      const { auth, linkedInProvider } = await import('./firebase');
+      if (auth && linkedInProvider) {
+        const { signInWithPopup } = await import('firebase/auth');
+        const result = await signInWithPopup(auth, linkedInProvider);
+        const user = result.user;
+        
+        const userData: MockUser = {
+          uid: user.uid,
+          email: user.email || '',
+          displayName: user.displayName || 'LinkedIn User',
+          photoURL: user.photoURL || '',
+          provider: 'linkedin'
+        };
+        
+        setUser(userData);
+        setIsDemo(false);
+        localStorage.setItem('dashboard_user', JSON.stringify(userData));
+      }
+    } catch (error: any) {
+      console.log('LinkedIn auth not configured, using demo mode', error.message);
       setUser(mockUser);
       setIsDemo(true);
       localStorage.setItem('dashboard_user', JSON.stringify(mockUser));
@@ -95,7 +190,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInWithProvider, signOut, isDemo }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      signInWithGoogle, 
+      signInWithTwitter,
+      signInWithGitHub,
+      signInWithLinkedIn,
+      signInWithProvider, 
+      signOut, 
+      isDemo 
+    }}>
       {children}
     </AuthContext.Provider>
   );

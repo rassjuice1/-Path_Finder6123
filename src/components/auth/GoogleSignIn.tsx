@@ -45,7 +45,7 @@ const socialProviders = [
 ];
 
 export default function GoogleSignIn() {
-  const { user, loading: authLoading, signInWithGoogle, signInWithProvider, isDemo } = useAuth();
+  const { user, loading: authLoading, signInWithGoogle, signInWithTwitter, signInWithGitHub, signInWithLinkedIn, isDemo } = useAuth();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -56,23 +56,28 @@ export default function GoogleSignIn() {
   }, [user, loading, router]);
 
   const handleSignIn = async (providerId: string) => {
-    // Demo mode: simulate different provider sign-ins
-    // In production, implement real OAuth for each provider
-    const providerNames: Record<string, string> = {
-      google: 'Google',
-      twitter: 'Twitter/X',
-      linkedin: 'LinkedIn',
-      github: 'GitHub'
-    };
-    
-    // Use the AuthContext function to properly set user
-    signInWithProvider(
-      providerId,
-      `demo@${providerId}.com`,
-      `${providerNames[providerId]} User`
-    );
-    
-    router.push('/');
+    setLoading(true);
+    try {
+      // Use real Firebase sign-in
+      switch (providerId) {
+        case 'google':
+          await signInWithGoogle();
+          break;
+        case 'twitter':
+          await signInWithTwitter();
+          break;
+        case 'github':
+          await signInWithGitHub();
+          break;
+        case 'linkedin':
+          await signInWithLinkedIn();
+          break;
+      }
+      router.push('/');
+    } catch (error) {
+      console.error('Sign in error:', error);
+      setLoading(false);
+    }
   };
 
   const handleDemoMode = () => {

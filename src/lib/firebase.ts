@@ -13,6 +13,9 @@ const firebaseConfig = {
 let app: any = null;
 let auth: any = null;
 let googleProvider: any = null;
+let twitterProvider: any = null;
+let linkedInProvider: any = null;
+let githubProvider: any = null;
 
 if (typeof window !== 'undefined') {
   try {
@@ -25,11 +28,23 @@ if (typeof window !== 'undefined') {
           app = firebaseApp.getApps()[0];
         }
         auth = firebaseAuth.getAuth(app);
-        googleProvider = new firebaseAuth.GoogleAuthProvider();
         
-        // Add Google profile scope
+        // Google Provider
+        googleProvider = new firebaseAuth.GoogleAuthProvider();
         googleProvider.addScope('profile');
         googleProvider.addScope('email');
+        
+        // Twitter/X Provider
+        twitterProvider = new firebaseAuth.TwitterAuthProvider();
+        
+        // GitHub Provider
+        githubProvider = new firebaseAuth.GithubAuthProvider();
+        githubProvider.addScope('user:email');
+        
+        // LinkedIn Provider (requires custom OAuth config)
+        linkedInProvider = new firebaseAuth.OAuthProvider('oidc.linkedin');
+        linkedInProvider.addScope('r_liteprofile');
+        linkedInProvider.addScope('r_emailaddress');
       });
     });
   } catch (error) {
@@ -37,7 +52,7 @@ if (typeof window !== 'undefined') {
   }
 }
 
-export { app, auth, googleProvider };
+export { app, auth, googleProvider, twitterProvider, linkedInProvider, githubProvider };
 
 // Mock user for demo mode (when Firebase is not configured)
 export interface MockUser {
