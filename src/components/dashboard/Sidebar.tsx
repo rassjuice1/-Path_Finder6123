@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCredits } from "@/lib/CreditContext";
+import { useAuth } from "@/lib/AuthContext";
+import Image from "next/image";
 
 interface NavItem {
   id: string;
@@ -32,6 +34,12 @@ interface SidebarProps {
 export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
   const router = useRouter();
   const { credits, tier } = useCredits();
+  const { user, isDemo, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push('/login');
+  };
 
   const handleNavigation = (item: NavItem) => {
     if (item.href) {
@@ -101,14 +109,34 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
       </nav>
       <div className="p-4 border-t border-neutral-700">
         <div className="flex items-center gap-3 px-4 py-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">
-            A
+          <Image 
+            src={user?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.displayName || 'U')}&background=4F46E5&color=fff`}
+            alt={user?.displayName || 'User'}
+            width={40}
+            height={40}
+            className="rounded-full"
+          />
+          <div className="flex-1 min-w-0">
+            <p className="text-white font-medium text-sm truncate">{user?.displayName || 'User'}</p>
+            <p className="text-neutral-500 text-xs truncate">{user?.email || 'No email'}</p>
           </div>
-          <div>
-            <p className="text-white font-medium text-sm">Admin User</p>
-            <p className="text-neutral-500 text-xs">admin@api.com</p>
-          </div>
+          <button
+            onClick={handleSignOut}
+            className="p-2 hover:bg-neutral-700 rounded-lg transition-colors text-neutral-400 hover:text-white"
+            title="Sign out"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </button>
         </div>
+        {isDemo && (
+          <div className="mx-4 mt-2 px-3 py-1.5 bg-amber-500/20 border border-amber-500/30 rounded-lg">
+            <p className="text-amber-400 text-xs font-medium">
+              ⚠️ Demo Mode - Sign in to save data
+            </p>
+          </div>
+        )}
       </div>
     </aside>
   );
