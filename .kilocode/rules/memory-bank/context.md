@@ -12,11 +12,15 @@ The dashboard now has working login/signup with social authentication options. I
 |----------|-------|---------|
 | YouTube Channel | `https://www.youtube.com/channel/UCECRGdrsdIGHwZdbw6PJgdg` | Starting point / Source |
 | Email Inbox | `https://mail.google.com/mail/u/0/#inbox/FMfcgzQfCDRsBzGQSVkvKQf` | Endpoint / Return destination |
+| Coinbase Wallet | Configured in userIdentity.ts | Payment receiving address |
+| Phantom Wallet | Configured in userIdentity.ts | Solana payments |
+| PayPal | Configured in userIdentity.ts | PayPal payments |
 
 ## Recently Completed
 
 - [x] Added YouTube channel as view description link (starting point)
 - [x] Added Gmail inbox as return link after authentication (endpoint)
+- [x] Added wallet addresses configuration to userIdentity.ts (Coinbase, Phantom, PayPal)
 - [x] Updated login flow to support return_url parameter
 - [x] Fixed login page - now shows social sign-in options instead of redirecting
 - [x] Added ProtectedDashboard to require authentication before viewing dashboard
