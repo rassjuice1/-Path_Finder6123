@@ -172,7 +172,7 @@ export function SocialMediaStats({ config }: SocialMediaStatsProps) {
                 </div>
               </div>
               <span className="text-neutral-500 text-xs">
-                {new Date(day.date).toLocaleDateString("en-US", { weekday: "short" })}
+                {day.date ? new Date(day.date).toLocaleDateString("en-US", { weekday: "short" }) : "N/A"}
               </span>
             </div>
           ))}

@@ -16,11 +16,11 @@ interface ErrorTrackerProps {
   onErrorCountChange?: (count: number) => void;
 }
 
-// Sample error data for demonstration
+// Sample error data for demonstration - using static dates to avoid hydration mismatch
 const mockErrors: ErrorLog[] = [
   {
     id: "1",
-    timestamp: new Date(Date.now() - 5 * 60 * 1000),
+    timestamp: new Date("2026-03-02T12:00:00Z"),
     type: "error",
     message: "Failed to fetch user data from API endpoint",
     source: "UserService.getUser()",
@@ -29,7 +29,7 @@ const mockErrors: ErrorLog[] = [
   },
   {
     id: "2",
-    timestamp: new Date(Date.now() - 15 * 60 * 1000),
+    timestamp: new Date("2026-03-02T11:45:00Z"),
     type: "warning",
     message: "API response time exceeded 5 seconds",
     source: "APIMiddleware.timeout",
@@ -37,7 +37,7 @@ const mockErrors: ErrorLog[] = [
   },
   {
     id: "3",
-    timestamp: new Date(Date.now() - 30 * 60 * 1000),
+    timestamp: new Date("2026-03-02T11:30:00Z"),
     type: "error",
     message: "Database connection pool exhausted",
     source: "DatabaseService.pool",
@@ -46,7 +46,7 @@ const mockErrors: ErrorLog[] = [
   },
   {
     id: "4",
-    timestamp: new Date(Date.now() - 45 * 60 * 1000),
+    timestamp: new Date("2026-03-02T11:15:00Z"),
     type: "warning",
     message: "Rate limit threshold approaching for IP 192.168.1.1",
     source: "RateLimiter.check",
@@ -54,7 +54,7 @@ const mockErrors: ErrorLog[] = [
   },
   {
     id: "5",
-    timestamp: new Date(Date.now() - 60 * 60 * 1000),
+    timestamp: new Date("2026-03-02T11:00:00Z"),
     type: "info",
     message: "Scheduled maintenance window starting",
     source: "SystemScheduler",

@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { RevenueAnalytics } from "@/components/dashboard/RevenueAnalytics";
+import { EmbeddedSite } from "@/components/dashboard/EmbeddedSite";
 
 // Simple navigation tabs
 const tabs = [
   { id: "overview", label: "Overview", icon: "📊" },
   { id: "revenue", label: "Path Coin Revenue", icon: "💰" },
   { id: "analytics", label: "Analytics", icon: "📈" },
+  { id: "site", label: "My Site", icon: "🌐" },
 ];
 
 // Mock stats for the dashboard
@@ -179,6 +181,12 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {activeTab === "site" && (
+          <div className="h-[calc(100vh-200px)] min-h-[500px]">
+            <EmbeddedSite domain="path-finder-ltd.site123.me" />
           </div>
         )}
       </main>
