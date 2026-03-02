@@ -25,6 +25,7 @@ The API Dashboard is now a comprehensive platform for creators to track AI API u
 - [x] **GA4 Support** - Environment variable for Google Analytics Property ID
 - [x] **Firebase Social Auth** - Real OAuth login with Google, Twitter, GitHub, LinkedIn
 - [x] **GA4 API Fix** - Moved Google Analytics to server-side API route to resolve Node.js module errors in browser
+- [x] **Firebase Initialization Fix** - Fixed Firebase initialization with proper async/await for better error handling
 
 ## Current Structure
 
@@ -102,7 +103,7 @@ export async function GET() {
 
 - [ ] Add more recipes (auth, email, etc.)
 - [x] **Cleanup** - Removed unused `src/lib/google-analytics.ts` file (was importing Node.js-specific libraries)
-- [ ] Add testing setup recipe
+- [x] **Firebase Fix** - Fixed Firebase initialization to use proper async/await for better error handling
 
 ## Session History
 
