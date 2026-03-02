@@ -26,7 +26,7 @@ export function Header({ title, subtitle }: HeaderProps) {
               <p className="text-white font-medium text-sm">Path Coin User</p>
               <p className="text-neutral-400 text-xs">Demo Account</p>
             </div>
-            <AvatarFromName name="Path Coin User" size={40} rounded />
+            <AvatarFromName name="Adolo Erysthee" size={40} rounded />
           </div>
           <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2">
             <span>🔄</span>
