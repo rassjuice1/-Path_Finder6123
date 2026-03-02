@@ -99,7 +99,7 @@ export function RevenueAnalytics() {
     <div className="space-y-8">
       {/* Revenue Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {revenueMetrics.map((metric) => (
+        {mockRevenueMetrics.map((metric) => (
           <div
             key={metric.id}
             className={`p-6 rounded-xl ${metric.color} border border-white/10`}
@@ -250,5 +250,3 @@ export function RevenueAnalytics() {
   );
 }
 
-// Export the metrics for use elsewhere
-export const revenueMetrics = mockRevenueMetrics;
