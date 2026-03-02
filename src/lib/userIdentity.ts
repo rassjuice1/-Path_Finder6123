@@ -21,6 +21,12 @@ export const USER_IDENTITY = {
   // These URLs are used as authentication endpoints
   authReturnUrl: USER_EMAIL_INBOX,
   viewDescriptionUrl: USER_YOUTUBE_CHANNEL,
+  // Personal wallet addresses for receiving payments
+  wallets: {
+    coinbase: "", // TODO: Add your Coinbase wallet address (e.g., 0x... for ETH or bc1... for BTC)
+    phantom: "",   // TODO: Add your Phantom wallet address (Solana)
+    paypal: "",   // TODO: Add your PayPal email
+  },
 } as const;
 
 /**
@@ -43,4 +49,18 @@ export function getReturnUrl(): string {
  */
 export function getViewDescriptionUrl(): string {
   return USER_YOUTUBE_CHANNEL;
+}
+
+/**
+ * Get user's Coinbase wallet address
+ */
+export function getCoinbaseWallet(): string {
+  return USER_IDENTITY.wallets.coinbase;
+}
+
+/**
+ * Get all wallet addresses
+ */
+export function getWalletAddresses() {
+  return USER_IDENTITY.wallets;
 }
