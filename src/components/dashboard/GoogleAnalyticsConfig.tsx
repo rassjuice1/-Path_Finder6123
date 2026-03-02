@@ -1,11 +1,40 @@
 "use client";
 
 import { useState } from "react";
-import { GAConfig, validateGAConfig, testGAConnection } from "@/lib/google-analytics";
+
+interface GAConfig {
+  propertyId: string;
+  credentials: string;
+}
 
 interface GoogleAnalyticsConfigProps {
   config: GAConfig;
   onUpdate: (config: GAConfig) => void;
+}
+
+function validateGAConfig(config: GAConfig): { valid: boolean; errors: string[] } {
+  const errors: string[] = [];
+  
+  if (!config.propertyId || config.propertyId.trim() === '') {
+    errors.push('Property ID is required');
+  } else if (!/^\d+$/.test(config.propertyId)) {
+    errors.push('Property ID must be a numeric string');
+  }
+  
+  if (!config.credentials || config.credentials.trim() === '') {
+    errors.push('Service account credentials are required');
+  } else {
+    try {
+      JSON.parse(config.credentials);
+    } catch {
+      errors.push('Invalid JSON format for credentials');
+    }
+  }
+  
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
 }
 
 export function GoogleAnalyticsConfig({
@@ -48,17 +77,28 @@ export function GoogleAnalyticsConfig({
       return;
     }
 
-    // Test the actual connection to Google Analytics
-    const result = await testGAConnection({
-      propertyId: propertyId.trim(),
-      credentials: credentials.trim(),
-    });
+    try {
+      // Test the connection via API route
+      const params = new URLSearchParams({
+        propertyId: propertyId.trim(),
+        credentials: credentials.trim(),
+      });
 
-    setTestResult(result.success ? "success" : "error");
-    if (!result.success) {
-      setTestError(result.error || "Connection failed");
-    } else {
-      setTestError(null);
+      const response = await fetch(`/api/ga?${params}`);
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setTestResult("success");
+        setTestError(null);
+      } else {
+        setTestResult("error");
+        setTestError(data.error || "Connection failed");
+      }
+    } catch (err) {
+      setTestResult("error");
+      setTestError(err instanceof Error ? err.message : "Connection failed");
+    } finally {
+      setTesting(false);
     }
   };
 

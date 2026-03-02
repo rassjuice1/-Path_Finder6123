@@ -1,18 +1,44 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  fetchGAMetrics,
-  fetchSocialSources,
-  fetchTrafficData,
-  getSocialSourceDisplayName,
-  GAConfig,
-  SocialSource,
-  TrafficData,
-} from "@/lib/google-analytics";
+
+interface GAConfig {
+  propertyId: string;
+  credentials: string;
+}
+
+interface SocialSource {
+  source: string;
+  sessions: number;
+  users: number;
+  engagementRate: number;
+}
+
+interface TrafficData {
+  date: string;
+  pageviews: number;
+  users: number;
+}
 
 interface SocialMediaStatsProps {
   config: GAConfig;
+}
+
+function getSocialSourceDisplayName(source: string): string {
+  const names: Record<string, string> = {
+    google: '🔍 Google Search',
+    direct: '🔗 Direct',
+    facebook: '📘 Facebook',
+    twitter: '🐦 Twitter/X',
+    instagram: '📸 Instagram',
+    linkedin: '💼 LinkedIn',
+    youtube: '▶️ YouTube',
+    tiktok: '🎵 TikTok',
+    reddit: '🤖 Reddit',
+    pinterest: '📌 Pinterest',
+  };
+  
+  return names[source] || source;
 }
 
 export function SocialMediaStats({ config }: SocialMediaStatsProps) {
@@ -31,13 +57,35 @@ export function SocialMediaStats({ config }: SocialMediaStatsProps) {
 
   useEffect(() => {
     async function loadData() {
+      if (!config.propertyId) {
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
-        const [metricsData, sourcesData, traffic] = await Promise.all([
-          fetchGAMetrics(config),
-          fetchSocialSources(config),
-          fetchTrafficData(config, 7),
+        
+        // Build query params
+        const params = new URLSearchParams({
+          propertyId: config.propertyId,
+          credentials: config.credentials,
+        });
+
+        // Fetch all data in parallel
+        const [metricsRes, sourcesRes, trafficRes] = await Promise.all([
+          fetch(`/api/ga?action=metrics&${params}`),
+          fetch(`/api/ga?action=sources&${params}`),
+          fetch(`/api/ga?action=traffic&${params}&days=7`),
         ]);
+
+        if (!metricsRes.ok || !sourcesRes.ok || !trafficRes.ok) {
+          throw new Error("Failed to fetch data");
+        }
+
+        const metricsData = await metricsRes.json();
+        const sourcesData = await sourcesRes.json();
+        const traffic = await trafficRes.json();
+
         setMetrics(metricsData);
         setSources(sourcesData);
         setTrafficData(traffic);
@@ -50,9 +98,7 @@ export function SocialMediaStats({ config }: SocialMediaStatsProps) {
       }
     }
 
-    if (config.propertyId) {
-      loadData();
-    }
+    loadData();
   }, [config]);
 
   if (loading) {
@@ -81,7 +127,7 @@ export function SocialMediaStats({ config }: SocialMediaStatsProps) {
     );
   }
 
-  const maxSessions = Math.max(...sources.map((s) => s.sessions));
+  const maxSessions = Math.max(...sources.map((s) => s.sessions), 1);
 
   return (
     <div className="space-y-6">
@@ -204,7 +250,7 @@ export function SocialMediaStats({ config }: SocialMediaStatsProps) {
                         className={`h-full rounded-full ${
                           source.engagementRate >= 65
                             ? "bg-green-500"
-                            : source.engagementRate >= 50
+                            : source.engagementRate >= 40
                             ? "bg-yellow-500"
                             : "bg-red-500"
                         }`}
