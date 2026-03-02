@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import useSWR from "swr";
 
 interface GAConfig {
   propertyId: string;
@@ -41,65 +41,39 @@ function getSocialSourceDisplayName(source: string): string {
   return names[source] || source;
 }
 
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 export function SocialMediaStats({ config }: SocialMediaStatsProps) {
-  const [metrics, setMetrics] = useState<{
-    activeUsers: number;
-    sessions: number;
-    pageviews: number;
-    bounceRate: number;
-    avgSessionDuration: number;
-    newUsers: number;
-  } | null>(null);
-  const [sources, setSources] = useState<SocialSource[]>([]);
-  const [trafficData, setTrafficData] = useState<TrafficData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { propertyId, credentials } = config;
 
-  useEffect(() => {
-    async function loadData() {
-      if (!config.propertyId) {
-        setLoading(false);
-        return;
-      }
+  // Build query string
+  const queryString = propertyId ? `propertyId=${propertyId}&credentials=${credentials}` : "";
 
-      try {
-        setLoading(true);
-        
-        // Build query params
-        const params = new URLSearchParams({
-          propertyId: config.propertyId,
-          credentials: config.credentials,
-        });
+  // SWR hooks for each data type
+  const { data: metricsData, error: metricsError, isLoading: metricsLoading } = useSWR(
+    propertyId ? `/api/ga?action=metrics&${queryString}` : null,
+    fetcher,
+    { revalidateOnFocus: false }
+  );
 
-        // Fetch all data in parallel
-        const [metricsRes, sourcesRes, trafficRes] = await Promise.all([
-          fetch(`/api/ga?action=metrics&${params}`),
-          fetch(`/api/ga?action=sources&${params}`),
-          fetch(`/api/ga?action=traffic&${params}&days=7`),
-        ]);
+  const { data: sourcesData, error: sourcesError, isLoading: sourcesLoading } = useSWR(
+    propertyId ? `/api/ga?action=sources&${queryString}` : null,
+    fetcher,
+    { revalidateOnFocus: false }
+  );
 
-        if (!metricsRes.ok || !sourcesRes.ok || !trafficRes.ok) {
-          throw new Error("Failed to fetch data");
-        }
+  const { data: trafficData, error: trafficError, isLoading: trafficLoading } = useSWR(
+    propertyId ? `/api/ga?action=traffic&${queryString}&days=7` : null,
+    fetcher,
+    { revalidateOnFocus: false }
+  );
 
-        const metricsData = await metricsRes.json();
-        const sourcesData = await sourcesRes.json();
-        const traffic = await trafficRes.json();
+  const loading = metricsLoading || sourcesLoading || trafficLoading;
+  const error = metricsError || sourcesError || trafficError;
 
-        setMetrics(metricsData);
-        setSources(sourcesData);
-        setTrafficData(traffic);
-        setError(null);
-      } catch (err) {
-        setError("Failed to load Google Analytics data");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadData();
-  }, [config]);
+  const metrics = metricsData || null;
+  const sources = sourcesData || [];
+  const traffic = trafficData || [];
 
   if (loading) {
     return (
@@ -127,7 +101,7 @@ export function SocialMediaStats({ config }: SocialMediaStatsProps) {
     );
   }
 
-  const maxSessions = Math.max(...sources.map((s) => s.sessions), 1);
+  const maxSessions = Math.max(...sources.map((s: SocialSource) => s.sessions), 1);
 
   return (
     <div className="space-y-6">
@@ -184,7 +158,7 @@ export function SocialMediaStats({ config }: SocialMediaStatsProps) {
           📊 Traffic Over Time (Last 7 Days)
         </h3>
         <div className="flex items-end justify-between h-48 gap-2">
-          {trafficData.map((day, index) => (
+          {traffic.map((day: TrafficData, index: number) => (
             <div key={index} className="flex-1 flex flex-col items-center gap-2">
               <div
                 className="w-full bg-gradient-to-t from-blue-600 to-blue-400 rounded-t hover:from-blue-500 hover:to-blue-300 transition-colors cursor-pointer relative group"
@@ -215,7 +189,7 @@ export function SocialMediaStats({ config }: SocialMediaStatsProps) {
           <div>
             <h4 className="text-neutral-400 text-sm mb-3">Sessions by Source</h4>
             <div className="space-y-3">
-              {sources.map((source, index) => (
+              {sources.map((source: SocialSource, index: number) => (
                 <div key={index} className="flex items-center gap-3">
                   <div className="w-32 text-neutral-300 text-sm truncate">
                     {getSocialSourceDisplayName(source.source)}
@@ -239,8 +213,8 @@ export function SocialMediaStats({ config }: SocialMediaStatsProps) {
             <h4 className="text-neutral-400 text-sm mb-3">Engagement Rate by Source</h4>
             <div className="space-y-3">
               {sources
-                .sort((a, b) => b.engagementRate - a.engagementRate)
-                .map((source, index) => (
+                .sort((a: SocialSource, b: SocialSource) => b.engagementRate - a.engagementRate)
+                .map((source: SocialSource, index: number) => (
                   <div key={index} className="flex items-center gap-3">
                     <div className="w-32 text-neutral-300 text-sm truncate">
                       {getSocialSourceDisplayName(source.source)}
