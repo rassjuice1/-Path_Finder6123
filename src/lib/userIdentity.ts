@@ -4,6 +4,7 @@
  * This file stores the user's identity information including:
  * - Starting point (YouTube channel as source)
  * - Endpoint (Gmail inbox as return destination)
+ * - Wallet addresses for receiving payments
  * 
  * These URLs are used to authenticate and recognize the user address.
  */
@@ -13,6 +14,9 @@ export const USER_YOUTUBE_CHANNEL = "https://www.youtube.com/channel/UCECRGdrsdI
 
 // Gmail Inbox - Endpoint / Return destination
 export const USER_EMAIL_INBOX = "https://mail.google.com/mail/u/0/#inbox/FMfcgzQfCDRsBzGQSVkvKQf";
+
+// Coinbase Home - Wallet provider homepage
+export const USER_COINBASE_HOME = "https://www.coinbase.com/home";
 
 // User identity information
 export const USER_IDENTITY = {
@@ -24,6 +28,7 @@ export const USER_IDENTITY = {
   // Personal wallet addresses for receiving payments
   wallets: {
     coinbase: "", // TODO: Add your Coinbase wallet address (e.g., 0x... for ETH or bc1... for BTC)
+    coinbaseHome: USER_COINBASE_HOME, // Coinbase homepage link
     phantom: "",   // TODO: Add your Phantom wallet address (Solana)
     paypal: "",   // TODO: Add your PayPal email
   },
