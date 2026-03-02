@@ -4,6 +4,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Twitter, Linkedin, Github, ArrowRight, Sparkles, BarChart3, Shield, Zap } from 'lucide-react';
+import { getReturnUrl, USER_EMAIL_INBOX } from '@/lib/userIdentity';
 
 // Social login providers
 const socialProviders = [
@@ -44,16 +45,26 @@ const socialProviders = [
   }
 ];
 
-export default function GoogleSignIn() {
+interface GoogleSignInProps {
+  returnUrl?: string;
+}
+
+export default function GoogleSignIn({ returnUrl }: GoogleSignInProps) {
   const { user, loading: authLoading, signInWithGoogle, signInWithTwitter, signInWithGitHub, signInWithLinkedIn, isDemo } = useAuth();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const defaultReturnUrl = returnUrl || getReturnUrl();
 
   useEffect(() => {
     if (!loading && user) {
-      router.push('/');
+      // Handle return URL - external links need window.location
+      if (defaultReturnUrl && (defaultReturnUrl.startsWith("http://") || defaultReturnUrl.startsWith("https://"))) {
+        window.location.href = defaultReturnUrl;
+      } else {
+        router.push(defaultReturnUrl || '/');
+      }
     }
-  }, [user, loading, router]);
+  }, [user, loading, router, defaultReturnUrl]);
 
   const handleSignIn = async (providerId: string) => {
     setLoading(true);
@@ -73,7 +84,12 @@ export default function GoogleSignIn() {
           await signInWithLinkedIn();
           break;
       }
-      router.push('/');
+      // Handle return URL after sign in
+      if (defaultReturnUrl && (defaultReturnUrl.startsWith("http://") || defaultReturnUrl.startsWith("https://"))) {
+        window.location.href = defaultReturnUrl;
+      } else {
+        router.push('/');
+      }
     } catch (error) {
       console.error('Sign in error:', error);
       setLoading(false);

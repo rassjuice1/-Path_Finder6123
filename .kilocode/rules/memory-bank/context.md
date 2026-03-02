@@ -6,8 +6,18 @@
 
 The dashboard now has working login/signup with social authentication options. It runs in demo mode without Firebase credentials, or can be configured with real Firebase credentials for full social login.
 
+## User Identity Information
+
+| Property | Value | Purpose |
+|----------|-------|---------|
+| YouTube Channel | `https://www.youtube.com/channel/UCECRGdrsdIGHwZdbw6PJgdg` | Starting point / Source |
+| Email Inbox | `https://mail.google.com/mail/u/0/#inbox/FMfcgzQfCDRsBzGQSVkvKQf` | Endpoint / Return destination |
+
 ## Recently Completed
 
+- [x] Added YouTube channel as view description link (starting point)
+- [x] Added Gmail inbox as return link after authentication (endpoint)
+- [x] Updated login flow to support return_url parameter
 - [x] Fixed login page - now shows social sign-in options instead of redirecting
 - [x] Added ProtectedDashboard to require authentication before viewing dashboard
 - [x] Social sign-in options: Google, Twitter/X, GitHub, LinkedIn
@@ -107,3 +117,6 @@ export async function GET() {
 | 2026-03-02 | Removed unused google-analytics.ts lib, using server-side API route for GA4 |
 | 2026-03-02 | Fixed demo mode login - properly set user in localStorage before redirect to dashboard
 | 2026-03-02 | Rebuilt simplified Path Coin dashboard - removed auth, focused on revenue tracking |
+| 2026-03-02 | Added YouTube channel as view description link (starting point/source) |
+| 2026-03-02 | Added Gmail inbox as return link after authentication (endpoint) |
+| 2026-03-02 | Created userIdentity.ts config for API address authentication |

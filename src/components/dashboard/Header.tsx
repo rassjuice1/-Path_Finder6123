@@ -1,6 +1,7 @@
 "use client";
 
 import { AvatarFromName } from "@/components/Avatar";
+import { getViewDescriptionUrl } from "@/lib/userIdentity";
 
 interface HeaderProps {
   title: string;
@@ -9,6 +10,8 @@ interface HeaderProps {
 }
 
 export function Header({ title, subtitle }: HeaderProps) {
+  const youtubeChannelUrl = getViewDescriptionUrl();
+  
   return (
     <header className="bg-neutral-800 border-b border-neutral-700 px-8 py-5">
       <div className="flex items-center justify-between">
@@ -17,6 +20,15 @@ export function Header({ title, subtitle }: HeaderProps) {
           <p className="text-neutral-400 mt-1">{subtitle}</p>
         </div>
         <div className="flex items-center gap-4">
+          <a 
+            href={youtubeChannelUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+          >
+            <span>📺</span>
+            View Description
+          </a>
           <button className="p-2 hover:bg-neutral-700 rounded-lg transition-colors relative">
             <span className="text-xl">🔔</span>
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>

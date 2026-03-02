@@ -2,19 +2,28 @@
 
 import GoogleSignIn from "@/components/auth/GoogleSignIn";
 import { useAuth } from "@/lib/AuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import { getReturnUrl, USER_EMAIL_INBOX } from "@/lib/userIdentity";
 
 export default function LoginPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnUrl = searchParams.get("return_url");
 
   useEffect(() => {
-    // If user is already logged in, redirect to dashboard
+    // If user is already logged in, redirect to return URL or dashboard
     if (!loading && user) {
-      router.push("/");
+      const destination = returnUrl || "/";
+      // If return URL is external (like Gmail), use window.location
+      if (returnUrl && (returnUrl.startsWith("http://") || returnUrl.startsWith("https://"))) {
+        window.location.href = returnUrl;
+      } else {
+        router.push(destination);
+      }
     }
-  }, [user, loading, router]);
+  }, [user, loading, router, returnUrl]);
 
   // Show loading while checking auth
   if (loading) {
@@ -34,7 +43,7 @@ export default function LoginPage() {
 
   // Show sign-in UI if no user
   if (!user) {
-    return <GoogleSignIn />;
+    return <GoogleSignIn returnUrl={returnUrl || getReturnUrl()} />;
   }
 
   return null;
