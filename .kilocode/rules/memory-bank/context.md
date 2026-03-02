@@ -2,9 +2,9 @@
 
 ## Current State
 
-**Dashboard Status**: ✅ Live - AI API Revenue Tracker for Creators
+**Dashboard Status**: ✅ Live - Path Coin Revenue Dashboard for Creators
 
-The API Dashboard is now a comprehensive platform for creators to track AI API usage and generate revenue. Users can sign up, get demo credits, and upgrade to paid plans.
+The Path Coin Dashboard is now a simplified, working platform for tracking revenue. No authentication required.
 
 ## Recently Completed
 
