@@ -81,6 +81,15 @@ export default function GoogleSignIn() {
   };
 
   const handleDemoMode = () => {
+    // Set demo user in localStorage before navigating
+    const demoUser = {
+      uid: 'demo-user-123',
+      email: 'demo@example.com',
+      displayName: 'Demo User',
+      photoURL: 'https://ui-avatars.com/api/?name=Demo+User&background=4F46E5&color=fff',
+      provider: 'demo'
+    };
+    localStorage.setItem('dashboard_user', JSON.stringify(demoUser));
     router.push('/');
   };
 

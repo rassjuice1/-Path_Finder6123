@@ -27,7 +27,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const savedUser = localStorage.getItem('dashboard_user');
     if (savedUser) {
       try {
-        setUser(JSON.parse(savedUser));
+        const parsedUser = JSON.parse(savedUser);
+        setUser(parsedUser);
+        // Check if it's a demo user
+        if (parsedUser.provider === 'demo' || parsedUser.uid === 'demo-user-123') {
+          setIsDemo(true);
+        }
       } catch (e) {
         console.error('Failed to parse saved user');
       }
