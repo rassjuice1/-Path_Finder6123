@@ -118,3 +118,4 @@ export async function GET() {
 | 2026-02-28 | Added Firebase social login (Google, Twitter, GitHub, LinkedIn) with real OAuth |
 | 2026-03-02 | Removed unused google-analytics.ts lib, using server-side API route for GA4 |
 | 2026-03-02 | Fixed demo mode login - properly set user in localStorage before redirect to dashboard
+| 2026-03-02 | Rebuilt simplified Path Coin dashboard - removed auth, focused on revenue tracking |
