@@ -26,6 +26,7 @@ The API Dashboard is now a comprehensive platform for creators to track AI API u
 - [x] **Firebase Social Auth** - Real OAuth login with Google, Twitter, GitHub, LinkedIn
 - [x] **GA4 API Fix** - Moved Google Analytics to server-side API route to resolve Node.js module errors in browser
 - [x] **Firebase Initialization Fix** - Fixed Firebase initialization with proper async/await for better error handling
+- [x] **Demo Mode Fix** - Fixed demo mode login by properly setting user in localStorage before redirecting to dashboard
 
 ## Current Structure
 
@@ -116,3 +117,4 @@ export async function GET() {
 | 2026-02-27 | Added GA4 Property ID env var support and .env.example template |
 | 2026-02-28 | Added Firebase social login (Google, Twitter, GitHub, LinkedIn) with real OAuth |
 | 2026-03-02 | Removed unused google-analytics.ts lib, using server-side API route for GA4 |
+| 2026-03-02 | Fixed demo mode login - properly set user in localStorage before redirect to dashboard
