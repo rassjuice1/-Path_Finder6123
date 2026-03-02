@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ProtectedDashboard } from "@/components/dashboard/ProtectedDashboard";
 
 // Company branding
 const COMPANY_NAME = "Content Distribution @Path_Finder#.Ltd";
@@ -56,6 +57,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
 
   return (
+    <ProtectedDashboard>
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
       {/* Header */}
       <header className="bg-black/30 backdrop-blur-md border-b border-white/10 px-6 py-4">
@@ -405,5 +407,6 @@ export default function Dashboard() {
         )}
       </main>
     </div>
+    </ProtectedDashboard>
   );
 }
