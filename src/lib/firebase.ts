@@ -16,40 +16,49 @@ let googleProvider: any = null;
 let twitterProvider: any = null;
 let linkedInProvider: any = null;
 let githubProvider: any = null;
+let firebaseInitialized = false;
 
-if (typeof window !== 'undefined') {
+async function initializeFirebase() {
+  if (typeof window === 'undefined' || firebaseInitialized) return;
+  
   try {
-    // Dynamically import firebase to avoid SSR issues
-    import('firebase/auth').then((firebaseAuth) => {
-      import('firebase/app').then((firebaseApp) => {
-        if (!firebaseApp.getApps().length) {
-          app = firebaseApp.initializeApp(firebaseConfig);
-        } else {
-          app = firebaseApp.getApps()[0];
-        }
-        auth = firebaseAuth.getAuth(app);
-        
-        // Google Provider
-        googleProvider = new firebaseAuth.GoogleAuthProvider();
-        googleProvider.addScope('profile');
-        googleProvider.addScope('email');
-        
-        // Twitter/X Provider
-        twitterProvider = new firebaseAuth.TwitterAuthProvider();
-        
-        // GitHub Provider
-        githubProvider = new firebaseAuth.GithubAuthProvider();
-        githubProvider.addScope('user:email');
-        
-        // LinkedIn Provider (requires custom OAuth config)
-        linkedInProvider = new firebaseAuth.OAuthProvider('oidc.linkedin');
-        linkedInProvider.addScope('r_liteprofile');
-        linkedInProvider.addScope('r_emailaddress');
-      });
-    });
+    const firebaseAuth = await import('firebase/auth');
+    const firebaseApp = await import('firebase/app');
+    
+    if (!firebaseApp.getApps().length) {
+      app = firebaseApp.initializeApp(firebaseConfig);
+    } else {
+      app = firebaseApp.getApps()[0];
+    }
+    
+    auth = firebaseAuth.getAuth(app);
+    
+    // Google Provider
+    googleProvider = new firebaseAuth.GoogleAuthProvider();
+    googleProvider.addScope('profile');
+    googleProvider.addScope('email');
+    
+    // Twitter/X Provider
+    twitterProvider = new firebaseAuth.TwitterAuthProvider();
+    
+    // GitHub Provider
+    githubProvider = new firebaseAuth.GithubAuthProvider();
+    githubProvider.addScope('user:email');
+    
+    // LinkedIn Provider (requires custom OAuth config)
+    linkedInProvider = new firebaseAuth.OAuthProvider('oidc.linkedin');
+    linkedInProvider.addScope('r_liteprofile');
+    linkedInProvider.addScope('r_emailaddress');
+    
+    firebaseInitialized = true;
   } catch (error) {
     console.error('Firebase initialization error:', error);
   }
+}
+
+// Initialize on module load (client-side only)
+if (typeof window !== 'undefined') {
+  initializeFirebase();
 }
 
 export { app, auth, googleProvider, twitterProvider, linkedInProvider, githubProvider };
