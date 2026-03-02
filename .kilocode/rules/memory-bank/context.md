@@ -101,7 +101,7 @@ export async function GET() {
 ## Pending Improvements
 
 - [ ] Add more recipes (auth, email, etc.)
-- [ ] Add example components
+- [x] **Cleanup** - Removed unused `src/lib/google-analytics.ts` file (was importing Node.js-specific libraries)
 - [ ] Add testing setup recipe
 
 ## Session History
@@ -114,3 +114,4 @@ export async function GET() {
 | 2026-02-26 | Added Revenue Analytics tab for monetizing dashboard data |
 | 2026-02-27 | Added GA4 Property ID env var support and .env.example template |
 | 2026-02-28 | Added Firebase social login (Google, Twitter, GitHub, LinkedIn) with real OAuth |
+| 2026-03-02 | Removed unused google-analytics.ts lib, using server-side API route for GA4 |
