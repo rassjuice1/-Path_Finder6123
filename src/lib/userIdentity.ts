@@ -21,6 +21,9 @@ export const USER_COINBASE_HOME = "https://www.coinbase.com/home";
 // Manus AI - External AI Agent Platform
 export const USER_MANUS_APP = "https://manus.im/app";
 
+// Telegram - Community/Channel
+export const USER_TELEGRAM = "https://t.me/PATHCoin@Path_Finder#.Ltd";
+
 // User identity information
 export const USER_IDENTITY = {
   youtubeChannel: USER_YOUTUBE_CHANNEL,
@@ -30,6 +33,7 @@ export const USER_IDENTITY = {
   viewDescriptionUrl: USER_YOUTUBE_CHANNEL,
   // External tools and platforms
   manusApp: USER_MANUS_APP,
+  telegram: USER_TELEGRAM,
   // Personal wallet addresses for receiving payments
   wallets: {
     coinbase: "", // TODO: Add your Coinbase wallet address (e.g., 0x... for ETH or bc1... for BTC)
@@ -80,4 +84,11 @@ export function getWalletAddresses() {
  */
 export function getManusAppUrl(): string {
   return USER_MANUS_APP;
+}
+
+/**
+ * Get Telegram channel URL
+ */
+export function getTelegramUrl(): string {
+  return USER_TELEGRAM;
 }

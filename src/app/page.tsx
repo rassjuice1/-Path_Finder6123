@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ProtectedDashboard } from "@/components/dashboard/ProtectedDashboard";
-import { USER_MANUS_APP } from "@/lib/userIdentity";
+import { USER_MANUS_APP, USER_TELEGRAM } from "@/lib/userIdentity";
 
 // Company branding
 const COMPANY_NAME = "Content Distribution @Path_Finder#.Ltd";
@@ -81,6 +81,15 @@ export default function Dashboard() {
             >
               <span>🤖</span>
               <span>Manus AI</span>
+            </a>
+            <a 
+              href={USER_TELEGRAM}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 transition-colors"
+            >
+              <span>✈️</span>
+              <span>Telegram</span>
             </a>
             <div className="bg-yellow-500/20 text-yellow-400 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2">
               <span>👤</span>
