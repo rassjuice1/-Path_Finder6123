@@ -85,8 +85,11 @@ export default function GoogleSignIn({ returnUrl }: GoogleSignInProps) {
           break;
       }
       // Handle return URL after sign in
-      if (defaultReturnUrl && (defaultReturnUrl.startsWith("http://") || defaultReturnUrl.startsWith("https://"))) {
-        window.location.href = defaultReturnUrl;
+      if (defaultReturnUrl && (defaultReturnUrl.startsWith('http://') || defaultReturnUrl.startsWith('https://'))) {
+        // Use useEffect to handle external redirect
+        setTimeout(() => {
+          window.location.href = defaultReturnUrl;
+        }, 100);
       } else {
         router.push('/');
       }
