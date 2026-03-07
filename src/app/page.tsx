@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ProtectedDashboard } from "@/components/dashboard/ProtectedDashboard";
+import { USER_MANUS_APP } from "@/lib/userIdentity";
 
 // Company branding
 const COMPANY_NAME = "Content Distribution @Path_Finder#.Ltd";
@@ -72,6 +73,15 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex items-center gap-4">
+            <a 
+              href={USER_MANUS_APP}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 transition-colors"
+            >
+              <span>🤖</span>
+              <span>Manus AI</span>
+            </a>
             <div className="bg-yellow-500/20 text-yellow-400 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2">
               <span>👤</span>
               <span>{ADMIN_NAME}</span>

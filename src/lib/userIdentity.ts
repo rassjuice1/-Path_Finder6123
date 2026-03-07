@@ -18,6 +18,9 @@ export const USER_EMAIL_INBOX = "https://mail.google.com/mail/u/0/#inbox/FMfcgzQ
 // Coinbase Home - Wallet provider homepage
 export const USER_COINBASE_HOME = "https://www.coinbase.com/home";
 
+// Manus AI - External AI Agent Platform
+export const USER_MANUS_APP = "https://manus.im/app";
+
 // User identity information
 export const USER_IDENTITY = {
   youtubeChannel: USER_YOUTUBE_CHANNEL,
@@ -25,6 +28,8 @@ export const USER_IDENTITY = {
   // These URLs are used as authentication endpoints
   authReturnUrl: USER_EMAIL_INBOX,
   viewDescriptionUrl: USER_YOUTUBE_CHANNEL,
+  // External tools and platforms
+  manusApp: USER_MANUS_APP,
   // Personal wallet addresses for receiving payments
   wallets: {
     coinbase: "", // TODO: Add your Coinbase wallet address (e.g., 0x... for ETH or bc1... for BTC)
@@ -68,4 +73,11 @@ export function getCoinbaseWallet(): string {
  */
 export function getWalletAddresses() {
   return USER_IDENTITY.wallets;
+}
+
+/**
+ * Get Manus AI app URL
+ */
+export function getManusAppUrl(): string {
+  return USER_MANUS_APP;
 }
